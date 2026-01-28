@@ -5,71 +5,82 @@ A collection of useful shell scripts for Hyprland window manager automation and 
 ## Scripts Overview
 
 ### `kill-active.sh`
-Intelligent window termination with multiple fallback strategies.
+Intelligent window termination with multiple fallback strategies for zombie processes.
 
+**Why?** Some applications leave zombie processes behind (Google Antigravity, Thunar rename operations, certain games). This script ensures complete process cleanup instead of just closing the window.
+
+**How it works:**
 - **Primary:** Attempts normal window close (`hyprctl dispatch killactive`)
 - **Secondary:** Force kills process group if window doesn't close
-- **Tertiary:** Deep cleanup for stubborn Electron apps (VSCode, Discord, etc.)
+- **Tertiary:** Deep cleanup for stubborn processes (Electron apps, game processes, etc.)
 - **Notifications:** Shows which processes are being terminated
 
-Useful for cleaning up frozen or unresponsive windows.
+Perfect for applications that don't fully terminate or leave orphaned processes.
 
 ---
 
 ### `monitor-switch.sh`
 Switches focus to the secondary monitor and centers the cursor.
 
+**Why?** Hyprland's "follow mouse focus" option causes issues: the cursor drifts when cycling windows in master layout. Disabling cursor movement creates a trap: fullscreen games on one monitor prevent escaping to the other. This script unlocks that by moving focus *and* cursor to the target monitor.
+
+**How it works:**
 - Detects connected monitors and identifies the focused one
 - Moves focus to the other monitor
-- Calculates monitor center coordinates (handles multi-monitor setups)
-- Moves cursor to center of target monitor
+- Calculates monitor center coordinates (handles multi-monitor setups precisely)
+- Moves cursor to center of target monitor for seamless interaction
 
-Great for dual-monitor workflows to quickly jump between displays.
+Essential for dual-monitor setups with fullscreen applications that would otherwise trap you.
 
 ---
 
 ### `screenshot-editor.sh`
-Takes region-based screenshots with annotation capabilities.
+Takes region-based screenshots with immediate annotation and clipboard export.
 
+**What it does:**
 - Select area with `slurp`
 - Captures with `grim`
 - Saves to `~/Imágenes/Screenshots/` with timestamp
 - Copies screenshot to clipboard
 - Opens **Swappy** for instant annotation/editing
 
-Perfect for capturing and annotating screen areas quickly.
-
+Result: Annotated screenshot ready to paste anywhere.
 **Requirements:** `grim`, `slurp`, `wl-copy`, `swappy`
 
 ---
 
 ### `screenshot-ocr.sh`
-Extracts text from screen regions using OCR.
+Extracts text from screen regions using OCR with preprocessing optimization.
 
+**What it does:**
 - Select area with `slurp`
 - Captures with `grim`
-- Pre-processes image with ImageMagick (grayscale, contrast normalization, sharpening)
+- Pre-processes image with ImageMagick (grayscale, contrast normalization, sharpening for OCR readability)
 - Runs **Tesseract** OCR (Spanish + English)
-- Copies extracted text to clipboard
+- Copies extracted text directly to clipboard
 - Shows completion notification
 
-Optimized for readable text extraction from screenshots.
+Result: Extracted text ready to paste. Perfect for quickly grabbing text from images, UI elements, or documents.
 
 **Requirements:** `grim`, `slurp`, `imagemagick`, `tesseract`, `wl-copy`
 
 ---
 
 ### `swap-content.sh`
-Swaps all windows between two monitors (dual-monitor workflow).
+Intelligently swaps all windows between two monitors while preserving layout structure.
 
-Uses the Hyprland "special workspace" as a temporary buffer:
-- **Step 1:** Moves all windows from Monitor A to special buffer
-- **Step 2:** Moves all windows from Monitor B to Monitor A
-- **Step 3:** Moves buffer contents to Monitor B
+**Why?** Hyprland's built-in workspace swap (`hyprctl dispatch swapactive`) completely shuffles workspaces, destroying custom configurations. This script swaps only the *windows* while keeping workspaces intact and organized.
 
-Result: Complete swap of workspaces/windows between monitors.
+**How it works (The Bubble Sort Method):**
+- **Step 1:** Moves all windows from Monitor A to a temporary special workspace (buffer)
+- **Step 2:** Moves all windows from Monitor B to Monitor A's workspace
+- **Step 3:** Moves buffered windows (originally from A) to Monitor B
 
-Useful for reorganizing layouts across dual monitors without manual dragging.
+The swap is imperceptible thanks to the intermediate workspace—everything moves seamlessly.
+
+**Result:** Windows exchange monitors while maintaining their workspace assignment and layout state.
+
+Perfect for reorganizing dual-monitor setups without disrupting your carefully configured layout.
 
 ---
 
