@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Captura el área (slurp)
-GEOM=$(slurp)
+# Congela la pantalla y captura el área
+GEOM=$(wayfreeze --after-freeze-cmd 'slurp; killall wayfreeze')
 if [ -z "$GEOM" ]; then exit 1; fi
 
 # Pre-procesado con ImageMagick para mejorar OCR:

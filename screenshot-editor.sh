@@ -6,11 +6,12 @@ FILE="$DIR/scr_$(date +%Y%m%d_%H%M%S).png"
 # Asegurar que el directorio existe
 mkdir -p "$DIR"
 
-# 1. Captura (grim/slurp)
-# 2. Guarda en la carpeta (tee)
-# 3. Copia al portapapeles (wl-copy) para que Noctalia lo vea
-grim -g "$(slurp)" - | tee "$FILE" | wl-copy
+# 1. Congela la pantalla y captura el área
+GEOM=$(wayfreeze --after-freeze-cmd 'slurp; killall wayfreeze')
+if [ -z "$GEOM" ]; then exit 1; fi
 
-# 4. Abre Swappy con el archivo guardado para editar/anotar
-# Swappy detectará que el archivo existe y te dejará editarlo.
-swappy -f "$FILE"
+# 2. Captura (grim) y envía a Satty
+# Satty recibe la imagen directamente desde grim (stdin) para editarla antes de guardar/copiar.
+# --output-filename: Define dónde se guardará el archivo si decides guardarlo en Satty.
+# --early-exit: Cierra Satty automáticamente después de copiar o guardar.
+grim -g "$GEOM" - | satty --filename - --output-filename "$FILE" --copy-command wl-copy --early-exit
